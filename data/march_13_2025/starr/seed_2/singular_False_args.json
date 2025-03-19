@@ -1,0 +1,40 @@
+{
+    "basepath": "./data",
+    "colocation_points": {
+        "_type": "python_object (type = ArrayImpl)",
+        "_value": "gASVggEAAAAAAACMDmpheC5fc3JjLmFycmF5lIwSX3JlY29uc3RydWN0X2FycmF5lJOUKIwVbnVtcHkuY29yZS5tdWx0aWFycmF5lIwMX3JlY29uc3RydWN0lJOUjAVudW1weZSMB25kYXJyYXmUk5RLAIWUQwFilIeUKEsBSzCFlGgGjAVkdHlwZZSTlIwCZjSUiYiHlFKUKEsDjAE8lE5OTkr/////Sv////9LAHSUYolDwAUvpzwFLyc9iMZ6PQUvpz3G+tA9iMb6PSRJEj4FLyc+5hQ8Psb6UD6n4GU+iMZ6PjTWhz4kSZI+FbycPgUvpz71obE+5hS8PtaHxj7G+tA+t23bPqfg5T6XU/A+iMb6PrycAj801gc/rA8NPyRJEj+dghc/FbwcP431IT8FLyc/fWgsP/WhMT9t2zY/5hQ8P15OQT/Wh0Y/TsFLP8b6UD8+NFY/t21bPy+nYD+n4GU/HxprP5dTcD8PjXU/iMZ6P5R0lH2UjAl3ZWFrX3R5cGWUiXN0lFKULg=="
+    },
+    "layer_sizes": [
+        1,
+        100,
+        100,
+        1
+    ],
+    "load_files": false,
+    "num_epochs_to_plot": null,
+    "num_integral_samples": 50,
+    "num_iters": 1000,
+    "num_seeds": 5,
+    "num_test_integral_samples": 1000,
+    "path": "./data/march_13_2025/starr",
+    "plot": false,
+    "plot_function_xlabel": "Position",
+    "plot_function_ylabel": "Crack Displacement",
+    "plot_log_loss": true,
+    "plot_path": "../div_by_zero_project/div_by_zero_paper/images",
+    "plot_title": "Crack Problem (Starr)",
+    "reproducibility": {
+        "command_line": "python lem_starr.py --run True --save_files AllSeeds --num_seeds 5",
+        "git_has_uncommitted_changes": true,
+        "git_root": "/Users/jessemichel/research/div_by_zero_project/div_by_zero",
+        "git_url": "https://github.com/martinjm97/div_by_zero/tree/bb5aa157bd043f975e716a51a6e5ff4a8d1a0802",
+        "time": "Thu Mar 13 12:11:03 2025"
+    },
+    "run": true,
+    "save_files": "AllSeeds",
+    "save_plot": false,
+    "seed": 2,
+    "singular": false,
+    "step_size": 0.01,
+    "truth_title": "Ground Truth"
+}

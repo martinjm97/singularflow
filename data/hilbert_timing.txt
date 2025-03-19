@@ -1,0 +1,21 @@
+
+# Hilbert transform mean and std x -0.46171376 0.0004068562 = $4.1 \times 10^{-4}$
+# Hilbert transform mean and std x^2 -0.23103614 0.00061295385 = $6.1 \times 10^{-4}$
+# Hilbert transform mean and std e^x -0.29075214 0.0009880341 = $9.9 \times 10^{-4}$
+# Hilbert transform mean and std xe^x -0.8936226 0.0005612587 = $5.6 \times 10^{-4}$
+# Hilbert transform mean and std sin(x) -0.40884495 0.00037055268 = $3.7 \times 10^{-4}$
+# Hilbert transform mean and std cos(x) 0.4586434 0.0010482314 = $1.0 \times 10^{-3}$
+
+# Deriv Hilbert transform mean and std x 0.7742251 0.0008137362 = $8.1 \times 10^{-4}$
+# Deriv Hilbert transform mean and std x^2 -0.074601114 0.0008137079 = $8.1 \times 10^{-4}$
+# Deriv Hilbert transform mean and std e^x 1.5178262 0.0009880201 = $9.9 \times 10^{-4}$
+# Deriv Hilbert transform mean and std xe^x 0.46807072 0.0011143866 = $1.1 \times 10^{-3}$
+# Deriv Hilbert transform mean and std sin(x) 0.81577474 0.0010482264 = $1.0 \times 10^{-3}$
+# Deriv Hilbert transform mean and std cos(x) 0.8674677 0.000370544 = $3.7 \times 10^{-4}$
+
+# Hilbert transform standard mean and std x -1.8056154 3.6633348 = $-1.8 \pm 3.7$
+# Hilbert transform standard mean and std x^2 -0.903052 1.8311301 = $-0.9 \pm 1.8$
+# Hilbert transform standard mean and std e^x -5.338193 12.079278 = $-5.3 \pm 12$
+# Hilbert transform standard mean and std xe^x -3.043506 6.0389924 = $-3.0 \pm 6.0$
+# Hilbert transform standard mean and std sin(x) -1.7143301 3.5126686 = $-1.7 \pm 3.5$
+# Hilbert transform standard mean and std cos(x) -2.5345685 6.430018 = $-2.5 \pm 6.4$
