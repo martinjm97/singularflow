@@ -101,8 +101,27 @@ def _singular_integrate(
 
     match pow:
         case 1:
-            symm_samples = jnp.concatenate([symm_samples, 2 * s - symm_samples])
-            symm_int = 2 * (symm_upper - symm_middle) * get_average_value(integrand, s, symm_samples)
+            # let h(x) = f(x) / (x - s)
+            # C int_a^b h(x) dx = int_a^s (f(x) - f(2s - x)) / (x - s) dx + int_{2s - a}^b h(x) dx  (by Proposition 3.6)
+            #                   = int_s^{2s - a} (f(x) - f(2s - x)) / (x - s) dx + int_{2s - a}^b h(x) dx  (by symmetry/change of variables)
+            # In the following code, symm_int estimates term 1 above and rest_int estimates term 2 above.
+
+            # To understand the estimator for term 1, we can rewrite the integral as:
+            # int_s^{2s - a} (f(x) - f(2s - x)) / (x - s) dx
+            #  = int_s^{2s - a} f(x) / (x - s) - f(2s - x) / (x - s) dx
+            #  = int_s^{2s - a} f(x) / (x - s) + f(2s - x) / ((2s - x) - s) dx
+            #  = int_s^{2s - a} h(x) + h(2s - x) dx
+            #  = 2 int_s^{2s - a} (h(x) + h(2s - x)) / 2 dx
+            # The Monte Carlo estimator for this integral is:
+            #  = 2 * ((2s - a) - s) * (h(v) + h(2s - v)) / 2    where v ~ U(s, 2s - a)
+            #  = 2 * (s - a) * average(h([v, 2s - v]))
+            # This approach allows us to vectorize integrand evaluation over nsymm_samples
+            nsymm_samples = jnp.concatenate([symm_samples, 2 * s - symm_samples])
+            symm_int = 2 * (symm_upper - symm_middle) * get_average_value(integrand, s, nsymm_samples)
+
+            # We now build a Monte Carlo estimator for term 2: int_{2s - a}^b h(x) dx.
+            # We do this directly:
+            # (b - (2s - a)) h(v) where v ~ U(2s - a, b)
             rest_int = (rest_upper - rest_lower) * get_average_value(integrand, s, rest_samples)
             return symm_int + rest_int
         case _:
@@ -125,6 +144,21 @@ if __name__ == "__main__":
     theta = jnp.array([1.0])
     s = 0.5
     num_samples = 1000
+
+    # C int_0^1 theta * x / (x - s) dx
+    # at s= 0.5, theta=1
+    # = C int_0^1 x / (x - 0.5) dx
+    # = C int_0^1 (x - 0.5 + 0.5) / (x - 0.5) dx
+    # = 1 + C int_0^1 0.5 / (x - 0.5) dx
+    # = 1 + 0.5 C int_0^1 1 / (x - 0.5) dx
+    # = 1 + 0.5 (log|x - 0.5||_x=0^1)
+    # = 1 + 0.5 (log|1 - 0.5| - log|0 - 0.5|)
+    # = 1 + 0.5 (log|0.5| - log|0.5|)
+    # = 1
+    print(
+        singular_integrate(numer, 1, bounds, key, num_samples, theta, s),
+        "should be 1.0",
+    )
 
     # H int_0^1 theta * x / (x - s)^2 dx
     # at s= 0.5, theta=1
