@@ -71,7 +71,7 @@ Code layout:
 
 `airfoil.py`: The script for solving the airfoil equation using a neural network (Figures 2 and 9).
 
-`lem_starr.py`: The script for solving the 1D crack problem using a neural network (Figure 10).
+`lem_starr.py`: The script for solving the 1D crack problem using a neural network (Figure 10). LEM stands for linear elastic mechanics, which is the subarea of mechanical engineering that studies this problem.
 
 `lem_pr1.py`: The script for solving the 2D crack problem using a neural network (Figure 11).
 
