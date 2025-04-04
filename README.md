@@ -31,7 +31,7 @@ and activate it with:
 Clone the `SingularFlow` repository and go into the cloned directory with `cd singularflow`.
 You can install all requirements by running:
 
-`pip install -r requirements.txt`,
+`python -m pip install -r requirements.txt`,
 
 where the primary dependencies are `flax`, `jax`, `matplotlib`, `pandas`, and `typed-argument-parser`.
 
