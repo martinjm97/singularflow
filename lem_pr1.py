@@ -15,7 +15,6 @@ class LEMArgs(LearningArgs):
     kappa: float = 3 - 4 * 0.25  # elastic constant, where = 0.25 is the poisson ratio for granite
     mu: float = 30  # Lamé second parameter similar to the shear modulus
     px: float = 1  # surface traction (constant load)
-    #     colocation_points = jnp.linspace(4, 6, 50)[1:-1]  # trim endpoints
     colocation_points = jnp.linspace(4, 6, 50)[1:-1]  # trim endpoints
 
     plot_title: str = "Crack Problem"

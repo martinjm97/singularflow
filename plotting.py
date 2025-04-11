@@ -3,8 +3,6 @@ import jax.numpy as jnp
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import rcParams
-from matplotlib.ticker import ScalarFormatter
-from matplotlib.ticker import FuncFormatter
 
 from training import load_model
 
@@ -38,7 +36,6 @@ def plot_losses(train_losses, test_losses, args, ground_truth_fun=None, extra_te
             plt.yticks(fontsize=20)
             plt.xlabel("Iteration", fontsize=32)
             plt.ylabel(f"{'Log ' if args.plot_log_loss else ''}{title} Loss", fontsize=32)
-            # plt.title(args.plot_title, fontsize=28)
             plt.legend(frameon=False, fontsize=26)
             plt.tight_layout()
         elif args.load_files == "AllSeeds":
@@ -90,24 +87,6 @@ def plot_losses(train_losses, test_losses, args, ground_truth_fun=None, extra_te
             (ours_handle,) = plt.plot(ours_mean, label="Ours", color="green", linewidth=4)
             (standard_handle,) = plt.plot(standard_mean, label="Standard", color="blue", linestyle="--", linewidth=4)
 
-            if args.plot_log_loss:
-
-                # class LogFormatter(ScalarFormatter):
-                #     def __init__(self, *args, **kwargs):
-                #         super().__init__(*args, **kwargs)
-                #         self.set_scientific(True)
-                #         # self.set_useMathText(True)
-
-                #     def __call__(self, x, pos=None):
-                #         return f"${10 ** x:.0e}$"
-                pass
-                # def log_formatter(y, pos):
-                #     value = np.exp(y)
-                #     exponent = int(np.floor(np.log10(value)))
-                #     mantissa = value / (10**exponent)
-                #     return f"${mantissa:.1f} \\cdot 10^{{{exponent}}}$"
-
-                # plt.gca().yaxis.set_major_formatter(FuncFormatter(log_formatter))
             for spine in plt.gca().spines.values():
                 spine.set_visible(False)
             plt.xticks(fontsize=20)
@@ -162,8 +141,6 @@ def plot_functions(bounds, params, args, ground_truth=None, extra_text: str = ""
         plt.yticks(fontsize=20)
         plt.xlabel(args.plot_function_xlabel, fontsize=32)
         plt.ylabel(args.plot_function_ylabel, fontsize=32)
-        # plt.title(args.plot_title, fontsize=28)
-        # plt.legend(frameon=False, loc="center right", fontsize=22)
         plt.legend(frameon=False, fontsize=26)
         plt.tight_layout()
         if args.save_plot:
@@ -217,8 +194,6 @@ def plot_functions(bounds, params, args, ground_truth=None, extra_text: str = ""
         plt.yticks(fontsize=20)
         plt.xlabel(args.plot_function_xlabel, fontsize=32)
         plt.ylabel(args.plot_function_ylabel, fontsize=32)
-        # plt.title(args.plot_title, fontsize=28)
-        # plt.legend(frameon=False, loc="center right", fontsize=22)
         plt.legend(frameon=False, fontsize=26)
         plt.tight_layout()
         if args.save_plot:

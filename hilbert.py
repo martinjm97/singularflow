@@ -65,52 +65,16 @@ def standard_hilbert(funs, exprs, num_samps: int = 10000):
             hilbert_at_half = -1 / jnp.pi * (bounds[1] - bounds[0]) * get_average_value(fun, 0.5, samples)
             standard.append(hilbert_at_half.item())
         standard = jnp.array(standard)
-        # print("Hilbert transform standard mean and std", expr, jnp.mean(standard), jnp.std(standard))
         means.append(jnp.mean(standard).item())
         stds.append(jnp.std(standard).item())
     return means, stds
-
-
-# This is actually the deriv of the standard hilbert
-# def standard_hilbert_deriv(funs, exprs, num_samps: int = 10000):
-#     means, stds = [], []
-#     for fun, expr in zip(funs, exprs):
-#         standard = []
-
-#         for i in range(10):
-#             key = random.PRNGKey(i)
-#             samples = uniform(key, (num_samps,), minval=-1, maxval=1)
-
-#             def f(s):
-#                 return -1 / jnp.pi * mc_integrate(fun, s, samples)
-
-#             deriv_at_half = jax.grad(f)(0.5)
-#             print(f"Iteration {i}, standard deriv at half", deriv_at_half)
-
-#             # def g(s):
-#             #     return -1 / jnp.pi * mc_integrate(lambda s, x: fun(s, x) / (x - s), s, samples)
-
-#             # print(f"Iteration {i}, standard deriv at half another way", g(0.5))
-
-#             standard.append(deriv_at_half.item())
-
-#         standard = jnp.array(standard)
-#         means.append(jnp.mean(standard).item())
-#         stds.append(jnp.std(standard).item())
-#     return means, stds
 
 
 def standard_hilbert_deriv(funs_div, exprs, num_samps: int = 10000):
     shd = []
     key = random.PRNGKey(0)
     bounds = (-1, 1)
-    # for fun, expr in zip(funs_div, exprs):
-    #     samples = uniform(key, (num_samps,), minval=-1, maxval=1)
 
-    #     def g(s):
-    #         return -1 / jnp.pi * mc_integrate(fun, s, samples)
-
-    #     shd.append(jax.grad(g)(0.5).item())
     for fun, expr in zip(funs_div, exprs):
         samples = uniform(key, (num_samps,), minval=bounds[0], maxval=bounds[1])
 
@@ -151,12 +115,6 @@ def deriv_pv(funs, exprs, num_samps: int = 10000):
     # C int_-1^1 f(x) / (x - s)^2 dx != H int_-1^1 f(x) / (s - x)^2 dx
     dpv = []
     for fun, expr in zip(funs, exprs):
-
-        # def pv(s):
-        #     key = random.PRNGKey(0)
-        #     bounds = (-1, 1)
-        #     symm_samples, rest_samples = get_samples(bounds, key, s, num_samps)
-        #     return -1 / jnp.pi * _singular_integrate(fun, 1, bounds, symm_samples, rest_samples, 0.0, s)
 
         def pv(s):
             key = random.PRNGKey(0)

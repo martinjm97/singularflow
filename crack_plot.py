@@ -49,14 +49,10 @@ def plot_crack(args):
 
     for spine in ax.spines.values():
         spine.set_edgecolor('gray')
-    # ax.spines['right'].set_visible(False)
-    # ax.spines['top'].set_visible(False)
-    # ax.spines['left'].set_visible(False)
-    # ax.spines['bottom'].set_visible(False)
 
     ax.set_xlabel('x', fontsize=label_fs)
     ax.set_ylabel('y', fontsize=label_fs)
-    # ax.set_title('Infinite Plane Strip with Crack', fontsize=title_fs)
+
     plt.tight_layout()
     if args.save_files:
         rcParams["text.usetex"] = True

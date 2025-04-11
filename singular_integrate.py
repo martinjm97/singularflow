@@ -8,11 +8,9 @@ from jax.random import uniform
 import numpy as np
 
 
-def get_average_value(integrand, s, samples, print_variance=False):
+def get_average_value(integrand, s, samples):
     """Get the average value of integrand(s, samples) at the given samples."""
     integrand_at_samples = jax.vmap(lambda samp: integrand(s, samp))(samples)
-    # if print_variance:
-    #     print(jnp.var(integrand_at_samples))
     return jnp.mean(integrand_at_samples)
 
 

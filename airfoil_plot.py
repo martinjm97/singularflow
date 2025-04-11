@@ -1,9 +1,5 @@
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
-import numpy as np
-from jax.tree_util import tree_unflatten, tree_structure
-import pickle
-from datetime import datetime
 from matplotlib import rcParams
 
 from utils import camber_line, AirfoilArgs, naca4
@@ -11,12 +7,6 @@ from utils import camber_line, AirfoilArgs, naca4
 
 def plot_airfoil(args: AirfoilArgs):
     plt.figure(figsize=(6, 2))
-    max_camber, location_of_max_camber, max_thickness, c = (
-        args.max_camber,
-        args.location_of_max_camber,
-        args.max_thickness,
-        args.c,
-    )
     x = jnp.linspace(0, 1, 10000)
     airfoil_coordinates = naca4(x, args)
     upper_surface = airfoil_coordinates[0]

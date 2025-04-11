@@ -24,8 +24,6 @@ class AirfoilArgs(LearningArgs):
 
     plot_function_ylabel: str = "Circulation Density"
     plot_title: str = "Airfoil Equation"
-    # debiased: bool = False
-    # plot_log_loss = True
 
 
 def dyc_over_dx(x, args: AirfoilArgs):
@@ -39,14 +37,6 @@ def dyc_over_dx(x, args: AirfoilArgs):
 def loss_fun_at_pnt(fun_of_s, s, key):
     rhs = args.V_inf * (jnp.sin(args.alpha) - dyc_over_dx(s, args) * jnp.cos(args.alpha))
     return (0.5 / jnp.pi * fun_of_s(s, key) - rhs) ** 2
-
-
-# def loss_fun_at_pnt_debiased(fun_of_s, s, key):
-#     rhs = args.V_inf * (jnp.sin(args.alpha) - dyc_over_dx(s, args) * jnp.cos(args.alpha))
-#     keys = jax.random.split(key, 2)
-#     est1 = fun_of_s(s, keys[0])
-#     est2 = fun_of_s(s, keys[1])
-#     return (0.5 / jnp.pi) ** 2 * est1 * est2 - 2 * rhs * (0.5 / jnp.pi) * est1 + rhs**2
 
 
 def create_loss_fun(key, args: AirfoilArgs, train=True):
@@ -87,9 +77,6 @@ def create_loss_fun(key, args: AirfoilArgs, train=True):
 
         integrand_at_pnt = lambda s, key: -integrate(integrand, s, key, state)
 
-        # if args.debiased:
-        #     lf = lambda s, key: loss_fun_at_pnt_debiased(integrand_at_pnt, s, key)
-        # else:
         lf = lambda s, key: loss_fun_at_pnt(integrand_at_pnt, s, key)
 
         return jnp.sum(jax.vmap(lf, in_axes=(0, None))(args.colocation_points, key))
