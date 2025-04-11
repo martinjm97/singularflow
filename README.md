@@ -145,7 +145,7 @@ Alternatively, you can train the neural networks from scratch. The current setti
 
 #### Load results from the paper
 
-It should take only a few seconds to load the data and plot the results.
+It should take only a few seconds to load the data and plot the results. The output will be the train loss, shown in the appendices, but not in Figure 2, followed by the test loss and learned solution shown in Figure 2.
 
 To reproduce the loss plots and function plot for Figure 2:
 
@@ -165,7 +165,7 @@ To reproduce the loss plots and function plot for Figure 11:
 
 #### Training neural networks to solve singular integral equations from scratch
 
-It should take around 20 seconds to train any of these models from scratch.
+It should take around 20 seconds to train any of these models from scratch. Each training run will produce a file in `data/CURRENT_DATE` (e.g., if the current date is `march_13_2025`, you can find the logs in `data/march_13_2025`). You can then plot these results with the commands above in the "Load results from the paper" section, replacing `march_13_2025` with `CURRENT_DATE` (e.g., after running `python airfoil.py --run True --save_files AllSeeds --num_seeds 5`, you can plot the results with `python airfoil.py --plot True --load_files AllSeeds --num_seeds 5 --path CURRENT_DATE`).
 
 To reproduce the training run from Figure 2:
 
@@ -185,3 +185,42 @@ To reproduce the training run from Figure 11:
 
 
 
+## Using and modifying SingularFlow
+
+The core implementation that extends JAX with the ability to differentiate singular integrals is in `singular_integrate.py`. 
+For example, to change the sampling algorithm, you could modify the `get_samples` function on line 65 and to change the derivative algorithm, you could modify `singular_integrate_bwd` on line 49.
+
+To perform singular integration in your own code, you can call the `singular_integrate` function defined on line 20:
+```
+singular_integrate(
+    numer: Callable[[jax.Array, jax.Array], jax.Array],
+    pow: int,
+    bounds: tuple[float, float],
+    key: jax.Array,
+    num_samples: int,
+    theta: jax.Array,
+    s: float,
+)
+```
+
+For example, if your current working director is `singularflow`, you can run:
+```
+from singular_integrate import singular_integrate
+
+key = jax.random.PRNGKey(0)
+numer = lambda x, theta: jnp.sum(theta * x)
+pow = 2
+bounds = (0, 1)
+theta = jnp.array([1.0])
+s = 0.5
+num_samples = 1000
+
+# C int_0^1 theta * x / (x - s) dx
+# at s= 0.5, theta=1
+print(
+      singular_integrate(numer, 1, bounds, key, num_samples, theta, s),
+      "should be 1.0",
+)
+```
+
+See the bottom of the `singular_integrate.py` file (lines 140-217) for more examples. 
