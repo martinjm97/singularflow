@@ -16,6 +16,9 @@ from singular_integrate import singular_integrate, get_average_value, get_sample
 from utils import round_sigfigs, latexify
 
 
+NUM_ITERS = 26
+
+
 def hilbert_transform(numer, key, num_samps):
     """Compute the Hilbert transform of f."""
 
@@ -158,31 +161,31 @@ def test_deriv_hilbert(funs, exprs, deriv_ground_truth, num_samps: int = 10000, 
     return our_deriv_means, our_deriv_stds
 
 
-def baseline_funs(funs, key, num_samps: int = 10000):
-    baseline_funs = []
+def standard_funs(funs, key, num_samps: int = 10000):
+    standard_funs = []
     bounds = (-1, 1)
     for fun in funs:
 
         def closure(fun):
-            def baseline_fun(s):
+            def standard_fun(s):
                 samples = uniform(key, (num_samps,), minval=bounds[0], maxval=bounds[1])
                 funsx = lambda s, x: fun(x, 0.0) / (x - s)
                 hilbert_at_half = -1 / jnp.pi * (bounds[1] - bounds[0]) * get_average_value(funsx, s, samples)
                 return hilbert_at_half
 
-            return baseline_fun
+            return standard_fun
 
-        baseline_funs.append(closure(fun))
-    return baseline_funs
+        standard_funs.append(closure(fun))
+    return standard_funs
 
 
-def hilbert_timing_baseline(funs, key, num_samps: int = 10000, use_jit: bool = False):
+def hilbert_timing_standard(funs, key, num_samps: int = 10000, use_jit: bool = False):
     times = []
     if use_jit:
-        compiled_funs = [jax.jit(baseline_fun) for baseline_fun in baseline_funs(funs, key, num_samps)]
+        compiled_funs = [jax.jit(standard_fun) for standard_fun in standard_funs(funs, key, num_samps)]
     else:
-        compiled_funs = baseline_funs(funs, key, num_samps)
-    for i in range(26):
+        compiled_funs = standard_funs(funs, key, num_samps)
+    for i in range(NUM_ITERS):
         start = time.time()
         for fun in compiled_funs:
             hilbert_at_half = fun(0.5)
@@ -192,13 +195,13 @@ def hilbert_timing_baseline(funs, key, num_samps: int = 10000, use_jit: bool = F
     return jnp.median(jnp.array(times)).item(), jnp.mean(jnp.array(times)).item(), jnp.std(jnp.array(times)).item()
 
 
-def deriv_hilbert_timing_baseline(funs, key, num_samps: int = 10000, use_jit: bool = False):
+def deriv_hilbert_timing_standard(funs, key, num_samps: int = 10000, use_jit: bool = False):
     times = []
     if use_jit:
-        compiled_funs = [jax.jit(jax.grad(baseline_fun)) for baseline_fun in baseline_funs(funs, key, num_samps)]
+        compiled_funs = [jax.jit(jax.grad(standard_fun)) for standard_fun in standard_funs(funs, key, num_samps)]
     else:
-        compiled_funs = [jax.grad(baseline_fun) for baseline_fun in baseline_funs(funs, key, num_samps)]
-    for i in range(26):
+        compiled_funs = [jax.grad(standard_fun) for standard_fun in standard_funs(funs, key, num_samps)]
+    for i in range(NUM_ITERS):
         start = time.time()
         for fun in compiled_funs:
             deriv_at_half = fun(0.5)
@@ -214,7 +217,7 @@ def hilbert_timing(funs, key, num_samps: int = 10000, use_jit: bool = False):
         hfs = [jax.jit(hilbert_transform(fun, key, num_samps)) for fun in funs]
     else:
         hfs = [hilbert_transform(fun, key, num_samps) for fun in funs]
-    for i in range(26):
+    for i in range(NUM_ITERS):
         start = time.time()
         for hf in hfs:
             deriv_at_half = hf(0.5).item()
@@ -231,7 +234,7 @@ def deriv_hilbert_timing(funs, key, num_samps: int = 10000, use_jit: bool = Fals
     else:
         grad_funs = [jax.grad(hilbert_transform(fun, key, num_samps)) for fun in funs]
 
-    for i in range(26):
+    for i in range(NUM_ITERS):
         start = time.time()
         for grad_fun in grad_funs:
             deriv_at_half = grad_fun(0.5)
@@ -241,13 +244,13 @@ def deriv_hilbert_timing(funs, key, num_samps: int = 10000, use_jit: bool = Fals
     return jnp.median(jnp.array(times)).item(), jnp.mean(jnp.array(times)).item(), jnp.std(jnp.array(times)).item()
 
 
-def hilbert_timing_baseline_each_benchmark(funs, key, num_samps: int = 10000, use_jit: bool = True):
+def hilbert_timing_standard_each_benchmark(funs, key, num_samps: int = 10000, use_jit: bool = True):
     all_times = []
-    for fun in baseline_funs(funs, key, num_samps):
+    for fun in standard_funs(funs, key, num_samps):
         times = []
 
         f = jax.jit(fun) if use_jit else fun
-        for i in range(26):
+        for i in range(NUM_ITERS):
             start = time.time()
             deriv_at_half = f(0.5).block_until_ready()
             end = time.time()
@@ -260,14 +263,14 @@ def hilbert_timing_baseline_each_benchmark(funs, key, num_samps: int = 10000, us
     return all_times
 
 
-def deriv_hilbert_timing_baseline_each_benchmark(funs, key, num_samps: int = 10000, use_jit: bool = True):
+def deriv_hilbert_timing_standard_each_benchmark(funs, key, num_samps: int = 10000, use_jit: bool = True):
     all_times = []
-    for fun in baseline_funs(funs, key, num_samps):
+    for fun in standard_funs(funs, key, num_samps):
         times = []
         f = jax.grad(fun)
         if use_jit:
             f = jax.jit(f)
-        for i in range(26):
+        for i in range(NUM_ITERS):
             start = time.time()
             deriv_at_half = f(0.5).block_until_ready()
             end = time.time()
@@ -288,7 +291,7 @@ def hilbert_timing_each_benchmark(funs, key, num_samps: int = 10000, use_jit: bo
     all_times = []
     for hf in hfs:
         times = []
-        for i in range(26):
+        for i in range(NUM_ITERS):
             start = time.time()
             deriv_at_half = hf(0.5).block_until_ready()
             end = time.time()
@@ -311,7 +314,7 @@ def deriv_hilbert_timing_each_benchmark(funs, key, num_samps: int = 10000, use_j
         hilbert_transform_deriv = jax.grad(hilbert_transform(fun, key, num_samps))
         if use_jit:
             hilbert_transform_deriv = jax.jit(hilbert_transform_deriv)
-        for i in range(26):
+        for i in range(NUM_ITERS):
             start = time.time()
             deriv_at_half = hilbert_transform_deriv(0.5).block_until_ready()
             end = time.time()
@@ -391,15 +394,15 @@ def table3(exprs, funs, key, args: Args):
 
     # Get times for all of the benchmarks
     use_jit = False
-    hilbert_baseline = hilbert_timing_baseline(funs, key, num_samples, use_jit)
+    hilbert_standard = hilbert_timing_standard(funs, key, num_samples, use_jit)
     hilbert = hilbert_timing(funs, key, num_samples, use_jit)
-    dhilbert_baseline = deriv_hilbert_timing_baseline(funs, key, num_samples, use_jit)
+    dhilbert_standard = deriv_hilbert_timing_standard(funs, key, num_samples, use_jit)
     dhilbert = deriv_hilbert_timing(funs, key, num_samples, use_jit)
 
     use_jit = True
-    hilbert_baseline_jit = hilbert_timing_baseline(funs, key, num_samples, use_jit)
+    hilbert_standard_jit = hilbert_timing_standard(funs, key, num_samples, use_jit)
     hilbert_jit = hilbert_timing(funs, key, num_samples, use_jit)
-    dhilbert_baseline_jit = deriv_hilbert_timing_baseline(funs, key, num_samples, use_jit)
+    dhilbert_standard_jit = deriv_hilbert_timing_standard(funs, key, num_samples, use_jit)
     dhilbert_jit = deriv_hilbert_timing(funs, key, num_samples, use_jit)
 
     latex = False
@@ -408,23 +411,23 @@ def table3(exprs, funs, key, args: Args):
     benchmark_data = [
         {
             "Benchmark": "Hilbert Transform",
-            "Baseline": round_sigfigs(scale * hilbert_baseline[1], p, latex),
-            "Baseline Std": round_sigfigs(scale * hilbert_baseline[2], p, latex),
+            "standard": round_sigfigs(scale * hilbert_standard[1], p, latex),
+            "standard Std": round_sigfigs(scale * hilbert_standard[2], p, latex),
             "Ours": round_sigfigs(scale * hilbert[1], p, latex),
             "Ours Std": round_sigfigs(scale * hilbert[2], p, latex),
-            "Baseline (JIT)": round_sigfigs(scale * hilbert_baseline_jit[1], p, latex),
-            "Baseline Std (JIT)": round_sigfigs(scale * hilbert_baseline_jit[2], p, latex),
+            "standard (JIT)": round_sigfigs(scale * hilbert_standard_jit[1], p, latex),
+            "standard Std (JIT)": round_sigfigs(scale * hilbert_standard_jit[2], p, latex),
             "Ours (JIT)": round_sigfigs(scale * hilbert_jit[1], p, latex),
             "Ours Std (JIT)": round_sigfigs(scale * hilbert_jit[2], p, latex),
         },
         {
             "Benchmark": "Deriv Hilbert Transform",
-            "Baseline": round_sigfigs(scale * dhilbert_baseline[1], p, latex),
-            "Baseline Std": round_sigfigs(scale * dhilbert_baseline[2], p, latex),
+            "standard": round_sigfigs(scale * dhilbert_standard[1], p, latex),
+            "standard Std": round_sigfigs(scale * dhilbert_standard[2], p, latex),
             "Ours": round_sigfigs(scale * dhilbert[1], p, latex),
             "Ours Std": round_sigfigs(scale * dhilbert[2], p, latex),
-            "Baseline (JIT)": round_sigfigs(scale * dhilbert_baseline_jit[1], p, latex),
-            "Baseline Std (JIT)": round_sigfigs(scale * dhilbert_baseline_jit[2], p, latex),
+            "standard (JIT)": round_sigfigs(scale * dhilbert_standard_jit[1], p, latex),
+            "standard Std (JIT)": round_sigfigs(scale * dhilbert_standard_jit[2], p, latex),
             "Ours (JIT)": round_sigfigs(scale * dhilbert_jit[1], p, latex),
             "Ours Std (JIT)": round_sigfigs(scale * dhilbert_jit[2], p, latex),
         },
@@ -441,19 +444,19 @@ def appx_computation_time(exprs, funs, key, args: Args):
     # Get times for each benchmark
     use_jit = False
 
-    hilbert_baseline = hilbert_timing_baseline_each_benchmark(funs, key, num_samples, use_jit)
+    hilbert_standard = hilbert_timing_standard_each_benchmark(funs, key, num_samples, use_jit)
     hilbert = hilbert_timing_each_benchmark(funs, key, num_samples, use_jit)
 
     dhilbert = deriv_hilbert_timing_each_benchmark(funs, key, num_samples, use_jit)
-    dhilbert_baseline = deriv_hilbert_timing_baseline_each_benchmark(funs, key, num_samples, use_jit)
+    dhilbert_standard = deriv_hilbert_timing_standard_each_benchmark(funs, key, num_samples, use_jit)
 
     use_jit = True
 
-    hilbert_baseline_jit = hilbert_timing_baseline_each_benchmark(funs, key, num_samples, use_jit)
+    hilbert_standard_jit = hilbert_timing_standard_each_benchmark(funs, key, num_samples, use_jit)
     hilbert_jit = hilbert_timing_each_benchmark(funs, key, num_samples, use_jit)
 
     dhilbert_jit = deriv_hilbert_timing_each_benchmark(funs, key, num_samples, use_jit)
-    dhilbert_baseline_jit = deriv_hilbert_timing_baseline_each_benchmark(funs, key, num_samples, use_jit)
+    dhilbert_standard_jit = deriv_hilbert_timing_standard_each_benchmark(funs, key, num_samples, use_jit)
 
     latex = False
 
@@ -463,13 +466,13 @@ def appx_computation_time(exprs, funs, key, args: Args):
     exprs_name = "$f(u)$" if latex else "f(u)"
     data = {
         exprs_name: exprs,
-        "Baseline": [f"{median*scale:.2f} ± {std*scale:.2f}" for median, _, std in hilbert_baseline],
+        "standard": [f"{median*scale:.2f} ± {std*scale:.2f}" for median, _, std in hilbert_standard],
         "Ours": [f"{median*scale:.2f} ± {std*scale:.2f}" for median, _, std in hilbert],
-        "Deriv. Baseline": [f"{median*scale:.2f} ± {std*scale:.2f}" for median, _, std in dhilbert_baseline],
+        "Deriv. standard": [f"{median*scale:.2f} ± {std*scale:.2f}" for median, _, std in dhilbert_standard],
         "Deriv Ours": [f"{median*scale:.2f} ± {std*scale:.2f}" for median, _, std in dhilbert],
-        "Baseline (JIT)": [f"{median*scale:.2f} ± {std*scale:.2f}" for median, _, std in hilbert_baseline_jit],
+        "standard (JIT)": [f"{median*scale:.2f} ± {std*scale:.2f}" for median, _, std in hilbert_standard_jit],
         "Ours (JIT)": [f"{median*scale:.2f} ± {std*scale:.2f}" for median, _, std in hilbert_jit],
-        "Deriv. Baseline (JIT)": [f"{median*scale:.2f} ± {std*scale:.2f}" for median, _, std in dhilbert_baseline_jit],
+        "Deriv. standard (JIT)": [f"{median*scale:.2f} ± {std*scale:.2f}" for median, _, std in dhilbert_standard_jit],
         "Deriv Ours (JIT)": [f"{median*scale:.2f} ± {std*scale:.2f}" for median, _, std in dhilbert_jit],
     }
     df = pd.DataFrame(data)
