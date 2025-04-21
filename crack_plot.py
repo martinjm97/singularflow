@@ -24,6 +24,12 @@ def plot_crack(args):
     crack_text_fs = 20
     label_fs = 20
     title_fs = 26
+    
+    # Set font parameters for all text elements
+    rcParams["text.usetex"] = True
+    rcParams["font.family"] = "libertine"
+    rcParams["pdf.fonttype"] = 42
+    rcParams["ps.fonttype"] = 42
 
     fig, ax = plt.subplots(figsize=(7, 3.5))
 
@@ -55,8 +61,6 @@ def plot_crack(args):
 
     plt.tight_layout()
     if args.save_files:
-        rcParams["text.usetex"] = True
-        rcParams["font.family"] = "libertine"
         plt.savefig(f"{args.path}/crack_fig.pdf")
         plt.clf()
     else:

@@ -12,6 +12,8 @@ def plot_losses(train_losses, test_losses, args, ground_truth_fun=None, extra_te
         if args.save_plot:
             rcParams["text.usetex"] = True
             rcParams["font.family"] = "libertine"
+            rcParams["pdf.fonttype"] = 42
+            rcParams["ps.fonttype"] = 42
         if args.load_files == "All" or len(losses) == 2:
             plt.figure(figsize=(7, 5))
             plt.plot(losses[0][: args.num_epochs_to_plot], label="Ours", color="green", linewidth=4)
@@ -113,9 +115,11 @@ def plot_losses(train_losses, test_losses, args, ground_truth_fun=None, extra_te
 
 
 def plot_functions(bounds, params, args, ground_truth=None, extra_text: str = ""):
-    if args.save_plot:
-        rcParams["text.usetex"] = True
-        rcParams["font.family"] = "libertine"
+    # if args.save_plot:
+    rcParams["text.usetex"] = True
+    rcParams["font.family"] = "libertine"
+    rcParams["pdf.fonttype"] = 42
+    rcParams["ps.fonttype"] = 42
     if args.load_files == "All":
         a, b = bounds
         singularp, standardp = params

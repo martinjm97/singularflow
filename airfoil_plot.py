@@ -38,6 +38,8 @@ def plot_airfoil(args: AirfoilArgs):
     if args.save_files:
         rcParams["text.usetex"] = True
         rcParams["font.family"] = "libertine"
+        rcParams["pdf.fonttype"] = 42
+        rcParams["ps.fonttype"] = 42 
         naca_text = (
             f"naca{str(args.max_camber)[-1]}{str(args.location_of_max_camber)[-1]}{str(args.max_thickness)[-2:]}"
         )
